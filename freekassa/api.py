@@ -1,6 +1,7 @@
-import requests
 import hashlib
 from urllib.parse import urlencode
+import aiohttp
+import ujson
 
 
 class FreeKassaApi:
@@ -17,7 +18,7 @@ class FreeKassaApi:
         self.wallet_id = wallet_id
         self.wallet_api_key = wallet_api_key
 
-    def send_request(self, params, url=None, method='post'):
+    async def send_request(self, params, url=None, method='post'):
         """
         Send request to freekassa api
         :param url:
@@ -27,10 +28,12 @@ class FreeKassaApi:
         """
         if url is None:
             url = self.base_url
+        
+        async with aiohttp.ClientSession(json_serialize=ujson.dumps,
+                                         raise_for_status=True) as session:
+            return await session.__dict__[method](url, params=params)
 
-        return requests.__dict__[method](url, params=params)
-
-    def get_balance(self):
+    async def get_balance(self):
         """
         Get merchant balance
         :return:
@@ -41,9 +44,9 @@ class FreeKassaApi:
             'action': 'get_balance',
         }
 
-        return self.send_request(params=params)
+        return await self.send_request(params=params)
 
-    def get_order(self, order_id='', int_id=''):
+    async def get_order(self, order_id='', int_id=''):
         """
         :return:
         """
@@ -55,9 +58,9 @@ class FreeKassaApi:
             'intid': int_id,
         }
 
-        return self.send_request(params=params)
+        return await self.send_request(params=params)
 
-    def export_order(self, status, date_from, date_to, limit=0, offset=100):
+    async def export_order(self, status, date_from, date_to, limit=0, offset=100):
         """
         Get orders list.
         :param status:
@@ -78,9 +81,9 @@ class FreeKassaApi:
             'offset': offset,
         }
 
-        return self.send_request(params=params)
+        return await self.send_request(params=params)
 
-    def withdraw(self, amount, currency):
+    async def withdraw(self, amount, currency):
         """
         Withdraw money.
         :param amount:
@@ -95,9 +98,9 @@ class FreeKassaApi:
             'action': 'payment',
         }
 
-        return self.send_request(params=params)
+        return await self.send_request(params=params)
 
-    def invoice(self, email, amount, description):
+    async def invoice(self, email, amount, description):
         """
         Create invoice.
         :param email:
@@ -114,9 +117,9 @@ class FreeKassaApi:
             'action': 'create_bill',
         }
 
-        return self.send_request(params)
+        return await self.send_request(params)
 
-    def get_wallet_balance(self):
+    async def get_wallet_balance(self):
         """
         Get wallet balance.
         :return:
@@ -127,9 +130,9 @@ class FreeKassaApi:
             'action': self.get_balance(),
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def wallet_withdraw(self, purse, amount, currency,
+    async def wallet_withdraw(self, purse, amount, currency,
                         description, disable_exchange=1):
         """
         Withdraw money from wallet.
@@ -157,9 +160,9 @@ class FreeKassaApi:
             ]),
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def get_operation_status(self, payment_id):
+    async def get_operation_status(self, payment_id):
         """
         Get operation status.
         :param payment_id:
@@ -176,9 +179,9 @@ class FreeKassaApi:
             'action': 'get_payment_status',
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def transfer_money(self, purse, amount):
+    async def transfer_money(self, purse, amount):
         """
         Transfer money to another wallet.
         :param purse:
@@ -198,9 +201,9 @@ class FreeKassaApi:
             'action': 'transfer',
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def online_payments(self, service_id, account, amount):
+    async def online_payments(self, service_id, account, amount):
         """
         Payment online services.
         :param service_id:
@@ -222,9 +225,9 @@ class FreeKassaApi:
             'action': 'online_payment',
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def get_online_services(self):
+    async def get_online_services(self):
         """
         Get list of payment services.
         :return:
@@ -235,9 +238,9 @@ class FreeKassaApi:
             'action': 'providers',
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def get_online_payment_status(self, payment_id):
+    async def get_online_payment_status(self, payment_id):
         """
         Check status online payment.
         :param payment_id:
@@ -254,30 +257,30 @@ class FreeKassaApi:
             'action': 'check_online_payment',
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def create_btc_address(self):
+    async def create_btc_address(self):
         """
         Create BTC address.
         :return:
         """
         return self.create_crypto_address('create_btc_address')
 
-    def create_ltc_address(self):
+    async def create_ltc_address(self):
         """
         Create LTC address.
         :return:
         """
         return self.create_crypto_address('create_ltc_address')
 
-    def create_eth_address(self):
+    async def create_eth_address(self):
         """
         Create ETH address.
         :return:
         """
         return self.create_crypto_address('create_eth_address')
 
-    def create_crypto_address(self, action):
+    async def create_crypto_address(self, action):
         """
         Create crypto wallet address.
         :param action:
@@ -289,30 +292,30 @@ class FreeKassaApi:
             'action': action,
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def get_btc_address(self):
+    async def get_btc_address(self):
         """
         Get BTC address.
         :return:
         """
         return self.get_crypto_address('get_btc_address')
 
-    def get_ltc_address(self):
+    async def get_ltc_address(self):
         """
         Get LTC address.
         :return:
         """
         return self.get_crypto_address('get_ltc_address')
 
-    def get_eth_address(self):
+    async def get_eth_address(self):
         """
         GET ETH address.
         :return:
         """
         return self.get_crypto_address('get_eth_address')
 
-    def get_crypto_address(self, action):
+    async def get_crypto_address(self, action):
         """
         Get crypto address by action.
         :param action:
@@ -324,9 +327,9 @@ class FreeKassaApi:
             'action': action,
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def get_btc_transaction(self, transaction_id):
+    async def get_btc_transaction(self, transaction_id):
         """
         Get information about BTC transaction.
         :param transaction_id:
@@ -334,7 +337,7 @@ class FreeKassaApi:
         """
         return self.get_transaction('get_btc_transaction', transaction_id)
 
-    def get_ltc_transaction(self, transaction_id):
+    async def get_ltc_transaction(self, transaction_id):
         """
         Get information about LTC transaction.
         :param transaction_id:
@@ -342,7 +345,7 @@ class FreeKassaApi:
         """
         return self.get_transaction('get_ltc_transaction', transaction_id)
 
-    def get_eth_transaction(self, transaction_id):
+    async def get_eth_transaction(self, transaction_id):
         """
         Get information about ETH transaction.
         :param transaction_id:
@@ -350,7 +353,7 @@ class FreeKassaApi:
         """
         return self.get_transaction('get_eth_transaction', transaction_id)
 
-    def get_transaction(self, action, transaction_id):
+    async def get_transaction(self, action, transaction_id):
         """
         Get information about transaction by action.
         :param action:
@@ -368,9 +371,9 @@ class FreeKassaApi:
             'action': action,
         }
 
-        return self.send_request(params=params, url=self.wallet_api_url)
+        return await self.send_request(params=params, url=self.wallet_api_url)
 
-    def generate_payment_link(self, order_id, summ,
+    async def generate_payment_link(self, order_id, summ,
                               email='', description='') -> str:
         """
         Generate payment link for redirect user to Free-Kassa.com.
@@ -393,7 +396,7 @@ class FreeKassaApi:
 
         return self.base_form_url + "?" + urlencode(params)
 
-    def generate_api_signature(self):
+    async def generate_api_signature(self):
         """
         Generate api signature
         :return:str
@@ -402,7 +405,7 @@ class FreeKassaApi:
             str(self.merchant_id).encode('utf-8')
             + str(self.second_secret).encode('utf-8')).hexdigest()
 
-    def generate_wallet_signature(self):
+    async def generate_wallet_signature(self):
         """
         Generate wallet signature
         :return:
@@ -411,7 +414,7 @@ class FreeKassaApi:
             str(self.wallet_id + self.wallet_api_key).encode('utf-8'))\
             .hexdigest()
 
-    def generate_form_signature(self, amount, order_id):
+    async def generate_form_signature(self, amount, order_id):
         """
         Generate signature for form and link
         :param amount:
@@ -425,7 +428,7 @@ class FreeKassaApi:
             str(order_id),
         ])
 
-    def __make_hash(self, params, sep=' '):
+    async def __make_hash(self, params, sep=' '):
         """
         Generate hash query for request params
         :param params:
