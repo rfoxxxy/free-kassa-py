@@ -373,8 +373,8 @@ class FreeKassaApi:
 
         return await self.send_request(params=params, url=self.wallet_api_url)
 
-    async def generate_payment_link(self, order_id, summ,
-                              email='', description='') -> str:
+    async def generate_payment_link(self, order_id, summ, currency='rub',
+                                    email='', description='', language='ru') -> str:
         """
         Generate payment link for redirect user to Free-Kassa.com.
         :param order_id:
@@ -388,9 +388,9 @@ class FreeKassaApi:
             'oa': summ,
             's': self.generate_form_signature(summ, order_id),
             'm': self.merchant_id,
-            'i': 'rub',
+            'i': currency,
             'em': email,
-            'lang': 'ru',
+            'lang': language,
             'us_desc': description,
         }
 
