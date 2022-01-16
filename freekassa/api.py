@@ -394,7 +394,7 @@ class FreeKassaApi:
             'us_desc': description,
         }
 
-        return await self.base_form_url + "?" + urlencode(params)
+        return self.base_form_url + "?" + urlencode(params)
 
     async def generate_api_signature(self):
         """
