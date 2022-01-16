@@ -13,7 +13,7 @@ except FileNotFoundError:
 
 setup(
     name='free-kassa-py',
-    version='1.0.8',
+    version='1.0.9',
     description='FreeKassa python 3 client',
     long_description=description,
     long_description_content_type='text/markdown',
