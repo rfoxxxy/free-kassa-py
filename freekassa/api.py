@@ -386,7 +386,7 @@ class FreeKassaApi:
         params = {
             'o': order_id,
             'oa': summ,
-            's': self.generate_form_signature(summ, order_id),
+            's': await self.generate_form_signature(summ, order_id),
             'm': self.merchant_id,
             'i': currency,
             'em': email,
