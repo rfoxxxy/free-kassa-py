@@ -6,7 +6,7 @@ import ujson
 
 class FreeKassaApi:
     base_url = 'https://www.free-kassa.ru/api.php'
-    base_form_url = 'http://www.free-kassa.ru/merchant/cash.php'
+    base_form_url = 'https://pay.freekassa.ru/'
     base_export_order_url = 'https://www.free-kassa.ru/export.php'
     wallet_api_url = 'https://www.fkwallet.ru/api_v1.php'
 
