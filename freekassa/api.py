@@ -388,8 +388,9 @@ class FreeKassaApi:
             'oa': summ,
             's': await self.generate_form_signature(summ, order_id),
             'm': self.merchant_id,
-            'i': currency,
+            'currency': currency,
             'lang': language,
+            'pay': "PAY",
             'us_desc': description,
         }
 
