@@ -40,7 +40,7 @@ class FreeKassaApi:
         """
         params = {
             'merchant_id': self.merchant_id,
-            's': self.generate_api_signature(),
+            's': await self.generate_api_signature(),
             'action': 'get_balance',
         }
 
@@ -52,7 +52,7 @@ class FreeKassaApi:
         """
         params = {
             'merchant_id': self.merchant_id,
-            's': self.generate_api_signature(),
+            's': await self.generate_api_signature(),
             'action': 'check_order_status',
             'order_id': order_id,
             'intid': int_id,
@@ -72,7 +72,7 @@ class FreeKassaApi:
         """
         params = {
             'merchant_id': self.merchant_id,
-            's': self.generate_api_signature(),
+            's': await self.generate_api_signature(),
             'action': 'get_orders',
             'date_from': date_from,
             'date_to': date_to,
@@ -94,7 +94,7 @@ class FreeKassaApi:
             'merchant_id': self.merchant_id,
             'currency': currency,
             'amount': amount,
-            's': self.generate_api_signature(),
+            's': await self.generate_api_signature(),
             'action': 'payment',
         }
 
@@ -113,7 +113,7 @@ class FreeKassaApi:
             'email': email,
             'amount': amount,
             'desc': description,
-            's': self.generate_api_signature(),
+            's': await self.generate_api_signature(),
             'action': 'create_bill',
         }
 
@@ -126,8 +126,8 @@ class FreeKassaApi:
         """
         params = {
             'wallet_id': self.wallet_id,
-            'sign': self.generate_wallet_signature(),
-            'action': self.get_balance(),
+            'sign': await self.generate_wallet_signature(),
+            'action': await self.get_balance(),
         }
 
         return await self.send_request(params=params, url=self.wallet_api_url)
@@ -151,7 +151,7 @@ class FreeKassaApi:
             'disable_exchange': disable_exchange,
             'currency': currency,
             'action': 'cashout',
-            'sign': self.__make_hash(params=[
+            'sign': await self.__make_hash(params=[
                 self.wallet_id,
                 currency,
                 amount,
@@ -171,7 +171,7 @@ class FreeKassaApi:
         params = {
             'wallet_id': self.wallet_id,
             'payment_id': payment_id,
-            'sign': self.__make_hash(params=[
+            'sign': await self.__make_hash(params=[
                 self.wallet_id,
                 payment_id,
                 self.wallet_api_key
@@ -192,7 +192,7 @@ class FreeKassaApi:
             'wallet_id': self.wallet_id,
             'purse': purse,
             'amount': amount,
-            'sign': self.__make_hash(params=[
+            'sign': await self.__make_hash(params=[
                 self.wallet_id,
                 purse,
                 amount,
@@ -216,7 +216,7 @@ class FreeKassaApi:
             'service_id': service_id,
             'account': account,
             'amount': amount,
-            'sign': self.__make_hash(params=[
+            'sign': await self.__make_hash(params=[
                 self.wallet_id,
                 amount,
                 account,
@@ -234,7 +234,7 @@ class FreeKassaApi:
         """
         params = {
             'wallet_id': self.wallet_id,
-            'sign': self.generate_wallet_signature(),
+            'sign': await self.generate_wallet_signature(),
             'action': 'providers',
         }
 
@@ -249,7 +249,7 @@ class FreeKassaApi:
         params = {
             'wallet_id': self.wallet_id,
             'payment_id': payment_id,
-            'sign': self.__make_hash(params=[
+            'sign': await self.__make_hash(params=[
                 self.wallet_id,
                 payment_id,
                 self.wallet_api_key
@@ -264,21 +264,21 @@ class FreeKassaApi:
         Create BTC address.
         :return:
         """
-        return self.create_crypto_address('create_btc_address')
+        return await self.create_crypto_address('create_btc_address')
 
     async def create_ltc_address(self):
         """
         Create LTC address.
         :return:
         """
-        return self.create_crypto_address('create_ltc_address')
+        return await self.create_crypto_address('create_ltc_address')
 
     async def create_eth_address(self):
         """
         Create ETH address.
         :return:
         """
-        return self.create_crypto_address('create_eth_address')
+        return await self.create_crypto_address('create_eth_address')
 
     async def create_crypto_address(self, action):
         """
@@ -288,7 +288,7 @@ class FreeKassaApi:
         """
         params = {
             'wallet_id': self.wallet_id,
-            'sign': self.generate_wallet_signature(),
+            'sign': await self.generate_wallet_signature(),
             'action': action,
         }
 
@@ -299,21 +299,21 @@ class FreeKassaApi:
         Get BTC address.
         :return:
         """
-        return self.get_crypto_address('get_btc_address')
+        return await self.get_crypto_address('get_btc_address')
 
     async def get_ltc_address(self):
         """
         Get LTC address.
         :return:
         """
-        return self.get_crypto_address('get_ltc_address')
+        return await self.get_crypto_address('get_ltc_address')
 
     async def get_eth_address(self):
         """
         GET ETH address.
         :return:
         """
-        return self.get_crypto_address('get_eth_address')
+        return await self.get_crypto_address('get_eth_address')
 
     async def get_crypto_address(self, action):
         """
@@ -323,7 +323,7 @@ class FreeKassaApi:
         """
         params = {
             'wallet_id': self.wallet_id,
-            'sign': self.generate_wallet_signature(),
+            'sign': await self.generate_wallet_signature(),
             'action': action,
         }
 
@@ -335,7 +335,7 @@ class FreeKassaApi:
         :param transaction_id:
         :return:
         """
-        return self.get_transaction('get_btc_transaction', transaction_id)
+        return await self.get_transaction('get_btc_transaction', transaction_id)
 
     async def get_ltc_transaction(self, transaction_id):
         """
@@ -343,7 +343,7 @@ class FreeKassaApi:
         :param transaction_id:
         :return:
         """
-        return self.get_transaction('get_ltc_transaction', transaction_id)
+        return await self.get_transaction('get_ltc_transaction', transaction_id)
 
     async def get_eth_transaction(self, transaction_id):
         """
@@ -351,7 +351,7 @@ class FreeKassaApi:
         :param transaction_id:
         :return:
         """
-        return self.get_transaction('get_eth_transaction', transaction_id)
+        return await self.get_transaction('get_eth_transaction', transaction_id)
 
     async def get_transaction(self, action, transaction_id):
         """
@@ -363,7 +363,7 @@ class FreeKassaApi:
         params = {
             'wallet_id': self.wallet_id,
             'transaction_id': transaction_id,
-            'sign': self.__make_hash(params=[
+            'sign': await self.__make_hash(params=[
                 self.wallet_id,
                 transaction_id,
                 self.wallet_api_key
@@ -386,7 +386,7 @@ class FreeKassaApi:
         params = {
             'o': order_id,
             'oa': summ,
-            's': await self.generate_form_signature(summ, order_id),
+            's': await self.generate_form_signature(summ, order_id, currency),
             'm': self.merchant_id,
             'currency': currency,
             'lang': language,
@@ -394,7 +394,7 @@ class FreeKassaApi:
             'us_desc': description,
         }
 
-        return self.base_form_url + "?" + urlencode(params)
+        return await self.base_form_url + "?" + urlencode(params)
 
     async def generate_api_signature(self):
         """
@@ -414,7 +414,7 @@ class FreeKassaApi:
             str(self.wallet_id + self.wallet_api_key).encode('utf-8'))\
             .hexdigest()
 
-    async def generate_form_signature(self, amount, order_id):
+    async def generate_form_signature(self, amount, order_id, currency):
         """
         Generate signature for form and link
         :param amount:
@@ -425,6 +425,7 @@ class FreeKassaApi:
             str(self.merchant_id),
             str(amount),
             str(self.first_secret),
+            str(currency),
             str(order_id),
         ])
 
